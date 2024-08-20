@@ -1,4 +1,4 @@
-**PartesBot: Automating Daily Reports in Telegram**
+**Automating Daily Reports in Telegram**
 
 PartesBot is a Telegram bot designed to automate and simplify the daily reporting process at work.
 This tool simplifies recording daily data from chat with a Telegram bot, saving you time and effort.
