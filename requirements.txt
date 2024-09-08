@@ -1,0 +1,5 @@
+pyTelegramBotAPI
+openpyxl
+schedule
+yagmail
+Pillow

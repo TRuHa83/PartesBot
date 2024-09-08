@@ -1,0 +1,7 @@
+{
+    "smtp_server": null,
+    "smtp_port": null,
+    "email": null,
+    "password": null,
+    "send_to": null
+}
