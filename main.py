@@ -43,7 +43,7 @@ try:
     bot = TeleBot(TOKEN)
 
 except Exception as e:
-    log.error(str(e))
+    log.error("Error al cargar las variables de entorno")
     sys.exit(1)
 
 # Globals
@@ -55,9 +55,25 @@ CONFIG = {}
 TIMES = {}
 FILENAME = None
 
-STATE['PROGRAM'] = STOP
-STATE['CURRENT'] = None
-STATE['REGISTRY'] = None
+
+def load_states():
+    global STATE
+
+    try:
+        # Lee el archivo state.json
+        with open(f'{work_folder}/state.json') as f:
+            STATE = json.load(f)
+
+    except Exception as e:
+        log.error(str(e))
+
+        STATE['PROGRAM'] = STOP
+        STATE['CURRENT'] = None
+        STATE['REGISTRY'] = None
+
+
+load_states()
+
 
 # Diccionario para almacenar el ultimo ID de mensaje del bot y user
 message_ids = {
@@ -75,6 +91,7 @@ def load_config():
     # Lee el archivo config.json
     with open(f'{config_folder}/config.json') as f:
         CONFIG = json.load(f)
+
 
 
 def get_list_time(entry_time, exit_time):
@@ -102,7 +119,11 @@ def authorized_handler(func):
 # Función para establecer el estado del bot
 def set_state(VARIABLE, state, value):
     global STATE, CONFIG, TIMES
+
     VARIABLE[state] = value
+    if VARIABLE == STATE:
+        with open(f'{work_folder}/state.json', 'w') as f:
+            json.dump(STATE, f, indent=4)
 
 
 # Contructor de menu
