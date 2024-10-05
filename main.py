@@ -506,8 +506,9 @@ def minute_selector(message):
 def end_day():
     global daily_registry
     while STATE['REGISTRY'] != 'saved':
-        daily_registration()
-        sleep(60)
+        if STATE['REGISTRY'] is None:
+            daily_registration()
+            sleep(300)
 
     bot.send_message(AUTHORIZED_CHAT, "Dia completado.")
     set_state(STATE, 'REGISTRY', None, )
