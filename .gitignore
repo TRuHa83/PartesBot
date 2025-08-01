@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.log
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+test.py
+
+# Entornos
+.venv/
+venv/
+.env
+
+# IDE/OS
+.vscode/
+.idea/
+.DS_Store
+
+# Docker
+.dockerignore
+
+# Scripts locales/irrelevantes para el repo
+publish.sh

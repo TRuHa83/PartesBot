@@ -1,4 +1,6 @@
 pyTelegramBotAPI
+requests>=2.32.4
+urllib3>=2.5.0
 openpyxl
 schedule
 yagmail

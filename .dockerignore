@@ -1,0 +1,43 @@
+# Repo y metadatos
+.git
+.gitignore
+.github/
+
+# IDE/OS
+.vscode/
+.idea/
+.DS_Store
+
+# Archivos que no necesitas dentro de la imagen
+README.md
+LICENSE
+tests/
+test.py
+publish.sh
+pictures/
+
+# Cachés/artefactos Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.log
+.pytest_cache/
+.mypy_cache/
+
+# Entornos y secretos
+.venv/
+venv/
+.env
+
+# Por seguridad, ignora todo por defecto…
+**
+
+!Dockerfile
+!requirements.txt
+!entrypoint.sh
+!main.py
+!archive.py
+!send.py
+!intratime.py
+!config.json
+!email.json
