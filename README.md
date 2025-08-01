@@ -8,6 +8,7 @@ This tool simplifies recording daily data from chat with a Telegram bot, saving 
 * Automation: Automatically registers daily data in .xlsx files from a Telegram bot.
 * Background Service: Runs as a background service for seamless integration.
 * Docker Support: Available as a Docker container for quick and easy deployment.
+* IntraTime Integration: Clock-in and clock-out directly from the bot using the IntraTime API with random GPS coordinates.
 
 **Prerequisites**
 
@@ -16,6 +17,10 @@ This tool simplifies recording daily data from chat with a Telegram bot, saving 
 * Environment Variables:
         + TOKEN: The token of your Telegram bot.
         + CHATID: The ID of the chat of your Telegram bot.
+        + INTRA_USER: Username for the IntraTime service.
+        + INTRA_PASS: Password or PIN for IntraTime.
+        + west: Base latitude for clocking location.
+        + north: Base longitude for clocking location.
   
 **Installation and Execution**
 
