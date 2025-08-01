@@ -15,12 +15,12 @@ This tool simplifies recording daily data from chat with a Telegram bot, saving 
 * Python: Make sure you have installed Python (version 3.x recommended).
 * Python Libraries: The dependencies are specified in the requirements.txt file.
 * Environment Variables:
-        + TOKEN: The token of your Telegram bot.
-        + CHATID: The ID of the chat of your Telegram bot.
-        + INTRA_USER: Username for the IntraTime service.
-        + INTRA_PASS: Password or PIN for IntraTime.
-        + west: Base latitude for clocking location.
-        + north: Base longitude for clocking location.
+  - TOKEN: The token of your Telegram bot.
+  - CHATID: The ID of the chat of your Telegram bot.
+  - INTRA_USER: Username for the IntraTime service.
+  - INTRA_PASS: Password or PIN for IntraTime.
+  - west: Base latitude for clocking location.
+  - north: Base longitude for clocking location.
   
 **Installation and Execution**
 
