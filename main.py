@@ -2,11 +2,15 @@ import os
 import sys
 import json
 import send
+import math
+import random
 import archive
+import intratime
 import logging as log
 import threading as th
 
 from time     import sleep
+from datetime import date, datetime, timedelta
 from schedule import every, run_pending, clear
 
 from telebot       import TeleBot
@@ -39,6 +43,12 @@ try:
     # TelegramBot Data
     TOKEN = os.getenv('TOKEN')
     AUTHORIZED_CHAT = int(os.getenv('CHATID'))
+
+    # IntraTime Data
+    INTRA_USER = os.getenv('INTRA_USER')
+    INTRA_PASS = os.getenv('INTRA_PASS')
+    LAT = os.getenv('west')
+    LON = os.getenv('north')
 
     bot = TeleBot(TOKEN)
 
@@ -75,13 +85,13 @@ def load_states():
 load_states()
 
 
-# Diccionario para almacenar el ultimo ID de mensaje del bot y user
+# Diccionario para almacenar el último ID de mensaje del bot y user
 message_ids = {
     'last_bot_message': None,
     'last_user_message': None
 }
 
-# Diccionario para almacenar los registros del dia
+# Diccionario para almacenar los registros del día
 daily_registry = []
 
 
@@ -91,7 +101,6 @@ def load_config():
     # Lee el archivo config.json
     with open(f'{config_folder}/config.json') as f:
         CONFIG = json.load(f)
-
 
 
 def get_list_time(entry_time, exit_time):
@@ -114,6 +123,54 @@ def authorized_handler(func):
             bot.send_message(message.chat.id, "No estás autorizado para usar este bot.")
 
     return wrapper
+
+
+def random_coordinates(lat, lon, radius_meters):
+    # Conversión del radio a grados (1 grado ≈ 111,320 metros en latitud)
+    radius_degrees = radius_meters / 111320
+
+    # Generar un desplazamiento aleatorio en un círculo (en radianes)
+    angle = random.uniform(0, 2 * math.pi)
+    distance = random.uniform(0, radius_degrees)  # Distancia aleatoria dentro del radio
+
+    # Calcular los desplazamientos en latitud y longitud
+    delta_lat = distance * math.cos(angle)
+    delta_lon = distance * math.sin(angle) / math.cos(math.radians(lat))
+
+    # Nuevas coordenadas
+    new_lat = lat + delta_lat
+    new_lon = lon + delta_lon
+
+    return new_lat, new_lon
+
+
+def get_location():
+    # Coordenadas aleatorias
+    lat = LAT
+    lon = LON
+    radius = 20  # Radio en metros
+    coordinates_n, coordinates_w = random_coordinates(lat, lon, radius)
+    location = f"{coordinates_n},{coordinates_w}"
+
+    return location
+
+
+def clocking(state):
+    hoy = date.today()
+
+    # Construye un datetime con la fecha de hoy y la hora indicada
+    t = TIMES['ENTRY'] if state == 'in' else TIMES['EXIT']
+    dt = datetime.combine(hoy, t) + timedelta(seconds=random.randint(0, 59))
+    date_time = dt.strftime("%Y-%m-%d %H:%M:%S")
+
+    try:
+        token = intratime.get_login_token(INTRA_USER, INTRA_PASS)
+        coordenadas = get_location()
+        result = intratime.clocking(state, token, date_time, coordenadas)
+        log.info(result)
+
+    except ValueError as e:
+        log.error(str(e))
 
 
 # Función para establecer el estado del bot
@@ -359,6 +416,8 @@ def handle_daily_registry(message):
         set_state(STATE, 'REGISTRY', 'site', )
 
     elif STATE['REGISTRY'] == 'site':
+        clocking('in')
+
         log.info(f'Lugar: {message.text}')
         daily_registry.append({'site': message.text,
                                'entry': 450,
@@ -391,6 +450,7 @@ def handle_daily_registry(message):
     elif STATE['REGISTRY'] == 'complete':
         bot.send_message(AUTHORIZED_CHAT, f"Registro completado")
         log.info('Registro completado')
+        clocking('out')
 
         set_state(STATE, 'CURRENT', 'check_registry', )
         message.text = 'Registro'
@@ -635,38 +695,46 @@ def manage_schedule_thread():
 
 
 if __name__ == '__main__':
-    control_thread = True
-    thread = None
+            control_thread = True
+            thread = None
 
-    try:
-        load_config()
+            try:
+                load_config()
+                log.info('Servicio iniciado')
 
-        log.info('Servicio inciado')
+                sent_message = bot.send_message(AUTHORIZED_CHAT, 'Servicio iniciado',
+                                              reply_markup=ReplyKeyboardRemove())
 
-        sent_message = bot.send_message(AUTHORIZED_CHAT, 'Servicio iniciado',
-                                        reply_markup=ReplyKeyboardRemove())
+                thread = th.Thread(target=manage_schedule_thread)
+                thread.start()
 
-        thread = (th.Thread(target=manage_schedule_thread))
-        thread.start()
+                if not CONFIG['BOT']:
+                    stop(sent_message)
 
-        if not CONFIG['BOT']:
-            stop(sent_message)
+                else:
+                    start(sent_message)
 
-        else:
-            start(sent_message)
+                bot.infinity_polling()
 
-        bot.infinity_polling()
+            except Exception as e:
+                log.error(str(e))
+                sys.exit(1)
 
-    except Exception as e:
-        log.error(str(e))
+            except KeyboardInterrupt:
+                log.info('Interrupción manual del servicio')
 
-    finally:
-        log.warning('Servicio detenido')
+            finally:
+                log.warning('Servicio detenido')
 
-        control_thread = False
+                # Detener el bot
+                try:
+                    bot.stop_polling()
+                except Exception as e:
+                    log.error(f'Error al detener el bot: {str(e)}')
 
-        if thread is not None and thread.is_alive():
-            thread.join()
+                # Detener el hilo de programación
+                control_thread = False
+                if thread is not None and thread.is_alive():
+                    thread.join(timeout=5)  # Esperar máximo 5 segundos
 
-        sys.exit(1)
-
+                sys.exit(0)  # Salida normal
