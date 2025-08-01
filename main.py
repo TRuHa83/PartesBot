@@ -1,18 +1,18 @@
-from schedule import every, run_pending, clear
-from telebot import TeleBot
-
-from telebot.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
-from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
-
-from time import sleep
-
-import threading as th
-import logging as log
-import archive
-import send
-import json
-import sys
 import os
+import sys
+import json
+import send
+import archive
+import logging as log
+import threading as th
+
+from time     import sleep
+from schedule import every, run_pending, clear
+
+from telebot       import TeleBot
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+from telebot.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
+
 
 # folders
 work_folder = os.path.abspath(os.path.dirname(sys.argv[0]))
