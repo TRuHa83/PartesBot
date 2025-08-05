@@ -159,7 +159,9 @@ def clocking(state):
     hoy = date.today()
 
     # Construye un datetime con la fecha de hoy y la hora indicada
-    t = TIMES['ENTRY'] if state == 'in' else TIMES['EXIT']
+    # Los valores de tiempo en TIMES se almacenan como cadenas "HH:MM"
+    t_str = TIMES['ENTRY'] if state == 'in' else TIMES['EXIT']
+    t = datetime.strptime(t_str, "%H:%M").time()
     dt = datetime.combine(hoy, t) + timedelta(seconds=random.randint(0, 59))
     date_time = dt.strftime("%Y-%m-%d %H:%M:%S")
 
