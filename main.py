@@ -47,8 +47,9 @@ try:
     # IntraTime Data
     INTRA_USER = os.getenv('INTRA_USER')
     INTRA_PASS = os.getenv('INTRA_PASS')
-    LAT = os.getenv('LATITUDE')
-    LON = os.getenv('LONGITUDE')
+    # Convert latitude and longitude to floats to avoid type errors
+    LAT = float(os.getenv('LATITUDE'))
+    LON = float(os.getenv('LONGITUDE'))
 
     bot = TeleBot(TOKEN)
 
