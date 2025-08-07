@@ -419,8 +419,6 @@ def handle_daily_registry(message):
         set_state(STATE, 'REGISTRY', 'site', )
 
     elif STATE['REGISTRY'] == 'site':
-        clocking('in')
-
         log.info(f'Lugar: {message.text}')
         daily_registry.append({'site': message.text,
                                'entry': 450,
@@ -453,7 +451,6 @@ def handle_daily_registry(message):
     elif STATE['REGISTRY'] == 'complete':
         bot.send_message(AUTHORIZED_CHAT, f"Registro completado")
         log.info('Registro completado')
-        clocking('out')
 
         set_state(STATE, 'CURRENT', 'check_registry', )
         message.text = 'Registro'
@@ -514,6 +511,9 @@ def handle_check_registry(message):
 
     elif accion == "Guardar":
         log.info('Guardar datos')
+        if any(reg['site'] not in ['Festivo', 'Vacaciones'] for reg in daily_registry):
+            clocking('in')
+            clocking('out')
 
         data = {
             'name': CONFIG['NAME'],
